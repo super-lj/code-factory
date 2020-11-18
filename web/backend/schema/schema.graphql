@@ -1,0 +1,101 @@
+schema {
+  query: Query
+}
+
+type Query {
+  repos(name: String): [Repo!]!
+}
+
+type Repo {
+  id: ID!
+  name: String!
+  branchesConnection(first: Int, after: ID): RepoBranchesConnection!
+  commitsConnection(first: Int, after: ID): RepoCommitsConnection!
+  runsConnection(first: Int, after: ID): RepoRunsConnection!
+}
+
+type Branch {
+  id: ID!
+  name: String!
+  commit: Commit!
+  runsConnection(first: Int, after: ID): BranchRunsConnection!
+}
+
+type Commit {
+  id: ID!
+  hash: String!
+  msg: String!
+  author: String!
+  runsConnection(first: Int, after: ID): CommitRunsConnection!
+}
+
+type Run {
+  id: ID!
+  num: Int!
+  startTimestamp: Int!
+  duration: Int!
+  status: Status!
+  log: String!
+  branch: Branch!
+  commit: Commit!
+}
+
+enum Status {
+  IN_PROGRESS
+  SUCCEED
+  FAILED
+}
+
+type RepoBranchesConnection {
+  pageInfo: PageInfo!
+  edges: [RepoBranchesEdge!]!
+}
+
+type RepoBranchesEdge {
+  cursor: ID!
+  node: Branch!
+}
+
+type RepoCommitsConnection {
+  pageInfo: PageInfo!
+  edges: [RepoCommitsEdge!]!
+}
+
+type RepoCommitsEdge {
+  cursor: ID!
+  node: Commit!
+}
+
+type RepoRunsConnection {
+  pageInfo: PageInfo!
+  edges: [RepoRunsEdge!]!
+}
+
+type RepoRunsEdge {
+  cursor: ID!
+  node: Run!
+}
+
+type BranchRunsConnection {
+  pageInfo: PageInfo!
+  edges: [BranchRunsEdge!]!
+}
+
+type BranchRunsEdge {
+  cursor: ID!
+  node: Run!
+}
+
+type CommitRunsConnection {
+  pageInfo: PageInfo!
+  edges: [CommitRunsEdge!]!
+}
+
+type CommitRunsEdge {
+  cursor: ID!
+  node: Run!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+}
