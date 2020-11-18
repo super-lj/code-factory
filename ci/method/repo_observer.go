@@ -13,7 +13,7 @@ import (
 )
 
 func IsTargetRepoUpdated(ctx context.Context, r *code_factory_ci.IsTargetRepoUpdatedRequest) (*code_factory_ci.IsTargetRepoUpdatedResponse, error) {
-	repoStruct, opRes := dao.GetRepoInfoById(ctx, r.GetHash())
+	repoStruct, opRes := dao.GetRepoInfoByHash(ctx, r.GetHash())
 	if !opRes.Success() {
 		logs.CtxError(ctx, "[GetRepoInfoById] fail")
 		return buildIsTargetRepoUpdated(false, "[GetRepoInfoById] fail", util.ErrDBRead), nil
