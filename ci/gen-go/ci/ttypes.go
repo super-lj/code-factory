@@ -639,7 +639,7 @@ func (p *BaseResp) String() string {
 }
 
 type IsTargetRepoUpdatedRequest struct {
-	RepoId *int64 `thrift:"RepoId,1" json:"RepoId"`
+	Hash *string `thrift:"Hash,1" json:"Hash"`
 	// unused fields # 2 to 254
 	Base *Base `thrift:"Base,255" json:"Base"`
 }
@@ -648,13 +648,13 @@ func NewIsTargetRepoUpdatedRequest() *IsTargetRepoUpdatedRequest {
 	return &IsTargetRepoUpdatedRequest{}
 }
 
-var IsTargetRepoUpdatedRequest_RepoId_DEFAULT int64
+var IsTargetRepoUpdatedRequest_Hash_DEFAULT string
 
-func (p *IsTargetRepoUpdatedRequest) GetRepoId() int64 {
-	if !p.IsSetRepoId() {
-		return IsTargetRepoUpdatedRequest_RepoId_DEFAULT
+func (p *IsTargetRepoUpdatedRequest) GetHash() string {
+	if !p.IsSetHash() {
+		return IsTargetRepoUpdatedRequest_Hash_DEFAULT
 	}
-	return *p.RepoId
+	return *p.Hash
 }
 
 var IsTargetRepoUpdatedRequest_Base_DEFAULT *Base
@@ -665,8 +665,8 @@ func (p *IsTargetRepoUpdatedRequest) GetBase() *Base {
 	}
 	return p.Base
 }
-func (p *IsTargetRepoUpdatedRequest) IsSetRepoId() bool {
-	return p.RepoId != nil
+func (p *IsTargetRepoUpdatedRequest) IsSetHash() bool {
+	return p.Hash != nil
 }
 
 func (p *IsTargetRepoUpdatedRequest) IsSetBase() bool {
@@ -710,10 +710,10 @@ func (p *IsTargetRepoUpdatedRequest) Read(iprot thrift.TProtocol) error {
 }
 
 func (p *IsTargetRepoUpdatedRequest) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
+	if v, err := iprot.ReadString(); err != nil {
 		return fmt.Errorf("error reading field 1: %s", err)
 	} else {
-		p.RepoId = &v
+		p.Hash = &v
 	}
 	return nil
 }
@@ -746,15 +746,15 @@ func (p *IsTargetRepoUpdatedRequest) Write(oprot thrift.TProtocol) error {
 }
 
 func (p *IsTargetRepoUpdatedRequest) writeField1(oprot thrift.TProtocol) (err error) {
-	if p.IsSetRepoId() {
-		if err := oprot.WriteFieldBegin("RepoId", thrift.I64, 1); err != nil {
-			return fmt.Errorf("%T write field begin error 1:RepoId: %s", p, err)
+	if p.IsSetHash() {
+		if err := oprot.WriteFieldBegin("Hash", thrift.STRING, 1); err != nil {
+			return fmt.Errorf("%T write field begin error 1:Hash: %s", p, err)
 		}
-		if err := oprot.WriteI64(int64(*p.RepoId)); err != nil {
-			return fmt.Errorf("%T.RepoId (1) field write error: %s", p, err)
+		if err := oprot.WriteString(string(*p.Hash)); err != nil {
+			return fmt.Errorf("%T.Hash (1) field write error: %s", p, err)
 		}
 		if err := oprot.WriteFieldEnd(); err != nil {
-			return fmt.Errorf("%T write field end error 1:RepoId: %s", p, err)
+			return fmt.Errorf("%T write field end error 1:Hash: %s", p, err)
 		}
 	}
 	return err
@@ -923,7 +923,7 @@ func (p *IsTargetRepoUpdatedResponse) String() string {
 }
 
 type FetchTargetRepoLastCommitRequest struct {
-	RepoId *int64 `thrift:"RepoId,1" json:"RepoId"`
+	Hash *string `thrift:"Hash,1" json:"Hash"`
 	// unused fields # 2 to 254
 	Base *Base `thrift:"Base,255" json:"Base"`
 }
@@ -932,13 +932,13 @@ func NewFetchTargetRepoLastCommitRequest() *FetchTargetRepoLastCommitRequest {
 	return &FetchTargetRepoLastCommitRequest{}
 }
 
-var FetchTargetRepoLastCommitRequest_RepoId_DEFAULT int64
+var FetchTargetRepoLastCommitRequest_Hash_DEFAULT string
 
-func (p *FetchTargetRepoLastCommitRequest) GetRepoId() int64 {
-	if !p.IsSetRepoId() {
-		return FetchTargetRepoLastCommitRequest_RepoId_DEFAULT
+func (p *FetchTargetRepoLastCommitRequest) GetHash() string {
+	if !p.IsSetHash() {
+		return FetchTargetRepoLastCommitRequest_Hash_DEFAULT
 	}
-	return *p.RepoId
+	return *p.Hash
 }
 
 var FetchTargetRepoLastCommitRequest_Base_DEFAULT *Base
@@ -949,8 +949,8 @@ func (p *FetchTargetRepoLastCommitRequest) GetBase() *Base {
 	}
 	return p.Base
 }
-func (p *FetchTargetRepoLastCommitRequest) IsSetRepoId() bool {
-	return p.RepoId != nil
+func (p *FetchTargetRepoLastCommitRequest) IsSetHash() bool {
+	return p.Hash != nil
 }
 
 func (p *FetchTargetRepoLastCommitRequest) IsSetBase() bool {
@@ -994,10 +994,10 @@ func (p *FetchTargetRepoLastCommitRequest) Read(iprot thrift.TProtocol) error {
 }
 
 func (p *FetchTargetRepoLastCommitRequest) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
+	if v, err := iprot.ReadString(); err != nil {
 		return fmt.Errorf("error reading field 1: %s", err)
 	} else {
-		p.RepoId = &v
+		p.Hash = &v
 	}
 	return nil
 }
@@ -1030,15 +1030,15 @@ func (p *FetchTargetRepoLastCommitRequest) Write(oprot thrift.TProtocol) error {
 }
 
 func (p *FetchTargetRepoLastCommitRequest) writeField1(oprot thrift.TProtocol) (err error) {
-	if p.IsSetRepoId() {
-		if err := oprot.WriteFieldBegin("RepoId", thrift.I64, 1); err != nil {
-			return fmt.Errorf("%T write field begin error 1:RepoId: %s", p, err)
+	if p.IsSetHash() {
+		if err := oprot.WriteFieldBegin("Hash", thrift.STRING, 1); err != nil {
+			return fmt.Errorf("%T write field begin error 1:Hash: %s", p, err)
 		}
-		if err := oprot.WriteI64(int64(*p.RepoId)); err != nil {
-			return fmt.Errorf("%T.RepoId (1) field write error: %s", p, err)
+		if err := oprot.WriteString(string(*p.Hash)); err != nil {
+			return fmt.Errorf("%T.Hash (1) field write error: %s", p, err)
 		}
 		if err := oprot.WriteFieldEnd(); err != nil {
-			return fmt.Errorf("%T write field end error 1:RepoId: %s", p, err)
+			return fmt.Errorf("%T write field end error 1:Hash: %s", p, err)
 		}
 	}
 	return err
@@ -1064,69 +1064,66 @@ func (p *FetchTargetRepoLastCommitRequest) String() string {
 	return fmt.Sprintf("FetchTargetRepoLastCommitRequest(%+v)", *p)
 }
 
-type CommitStruct struct {
-	Id             *int64  `thrift:"Id,1" json:"Id"`
-	Msg            *string `thrift:"Msg,2" json:"Msg"`
-	Author         *string `thrift:"Author,3" json:"Author"`
-	LastUpdateTime *int64  `thrift:"LastUpdateTime,4" json:"LastUpdateTime"`
+type CommitInfo struct {
+	Hash    *string `thrift:"Hash,1" json:"Hash"`
+	Msg     *string `thrift:"Msg,2" json:"Msg"`
+	Author  *string `thrift:"Author,3" json:"Author"`
+	RunNums []int32 `thrift:"RunNums,4" json:"RunNums"`
 }
 
-func NewCommitStruct() *CommitStruct {
-	return &CommitStruct{}
+func NewCommitInfo() *CommitInfo {
+	return &CommitInfo{}
 }
 
-var CommitStruct_Id_DEFAULT int64
+var CommitInfo_Hash_DEFAULT string
 
-func (p *CommitStruct) GetId() int64 {
-	if !p.IsSetId() {
-		return CommitStruct_Id_DEFAULT
+func (p *CommitInfo) GetHash() string {
+	if !p.IsSetHash() {
+		return CommitInfo_Hash_DEFAULT
 	}
-	return *p.Id
+	return *p.Hash
 }
 
-var CommitStruct_Msg_DEFAULT string
+var CommitInfo_Msg_DEFAULT string
 
-func (p *CommitStruct) GetMsg() string {
+func (p *CommitInfo) GetMsg() string {
 	if !p.IsSetMsg() {
-		return CommitStruct_Msg_DEFAULT
+		return CommitInfo_Msg_DEFAULT
 	}
 	return *p.Msg
 }
 
-var CommitStruct_Author_DEFAULT string
+var CommitInfo_Author_DEFAULT string
 
-func (p *CommitStruct) GetAuthor() string {
+func (p *CommitInfo) GetAuthor() string {
 	if !p.IsSetAuthor() {
-		return CommitStruct_Author_DEFAULT
+		return CommitInfo_Author_DEFAULT
 	}
 	return *p.Author
 }
 
-var CommitStruct_LastUpdateTime_DEFAULT int64
+var CommitInfo_RunNums_DEFAULT []int32
 
-func (p *CommitStruct) GetLastUpdateTime() int64 {
-	if !p.IsSetLastUpdateTime() {
-		return CommitStruct_LastUpdateTime_DEFAULT
-	}
-	return *p.LastUpdateTime
+func (p *CommitInfo) GetRunNums() []int32 {
+	return p.RunNums
 }
-func (p *CommitStruct) IsSetId() bool {
-	return p.Id != nil
+func (p *CommitInfo) IsSetHash() bool {
+	return p.Hash != nil
 }
 
-func (p *CommitStruct) IsSetMsg() bool {
+func (p *CommitInfo) IsSetMsg() bool {
 	return p.Msg != nil
 }
 
-func (p *CommitStruct) IsSetAuthor() bool {
+func (p *CommitInfo) IsSetAuthor() bool {
 	return p.Author != nil
 }
 
-func (p *CommitStruct) IsSetLastUpdateTime() bool {
-	return p.LastUpdateTime != nil
+func (p *CommitInfo) IsSetRunNums() bool {
+	return p.RunNums != nil
 }
 
-func (p *CommitStruct) Read(iprot thrift.TProtocol) error {
+func (p *CommitInfo) Read(iprot thrift.TProtocol) error {
 	if _, err := iprot.ReadStructBegin(); err != nil {
 		return fmt.Errorf("%T read error: %s", p, err)
 	}
@@ -1170,16 +1167,16 @@ func (p *CommitStruct) Read(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *CommitStruct) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
+func (p *CommitInfo) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
 		return fmt.Errorf("error reading field 1: %s", err)
 	} else {
-		p.Id = &v
+		p.Hash = &v
 	}
 	return nil
 }
 
-func (p *CommitStruct) ReadField2(iprot thrift.TProtocol) error {
+func (p *CommitInfo) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return fmt.Errorf("error reading field 2: %s", err)
 	} else {
@@ -1188,7 +1185,7 @@ func (p *CommitStruct) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *CommitStruct) ReadField3(iprot thrift.TProtocol) error {
+func (p *CommitInfo) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return fmt.Errorf("error reading field 3: %s", err)
 	} else {
@@ -1197,17 +1194,30 @@ func (p *CommitStruct) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *CommitStruct) ReadField4(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
-		return fmt.Errorf("error reading field 4: %s", err)
-	} else {
-		p.LastUpdateTime = &v
+func (p *CommitInfo) ReadField4(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return fmt.Errorf("error reading list begin: %s", err)
+	}
+	tSlice := make([]int32, 0, size)
+	p.RunNums = tSlice
+	for i := 0; i < size; i++ {
+		var _elem4 int32
+		if v, err := iprot.ReadI32(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_elem4 = v
+		}
+		p.RunNums = append(p.RunNums, _elem4)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return fmt.Errorf("error reading list end: %s", err)
 	}
 	return nil
 }
 
-func (p *CommitStruct) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("CommitStruct"); err != nil {
+func (p *CommitInfo) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("CommitInfo"); err != nil {
 		return fmt.Errorf("%T write struct begin error: %s", p, err)
 	}
 	if err := p.writeField1(oprot); err != nil {
@@ -1231,22 +1241,22 @@ func (p *CommitStruct) Write(oprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *CommitStruct) writeField1(oprot thrift.TProtocol) (err error) {
-	if p.IsSetId() {
-		if err := oprot.WriteFieldBegin("Id", thrift.I64, 1); err != nil {
-			return fmt.Errorf("%T write field begin error 1:Id: %s", p, err)
+func (p *CommitInfo) writeField1(oprot thrift.TProtocol) (err error) {
+	if p.IsSetHash() {
+		if err := oprot.WriteFieldBegin("Hash", thrift.STRING, 1); err != nil {
+			return fmt.Errorf("%T write field begin error 1:Hash: %s", p, err)
 		}
-		if err := oprot.WriteI64(int64(*p.Id)); err != nil {
-			return fmt.Errorf("%T.Id (1) field write error: %s", p, err)
+		if err := oprot.WriteString(string(*p.Hash)); err != nil {
+			return fmt.Errorf("%T.Hash (1) field write error: %s", p, err)
 		}
 		if err := oprot.WriteFieldEnd(); err != nil {
-			return fmt.Errorf("%T write field end error 1:Id: %s", p, err)
+			return fmt.Errorf("%T write field end error 1:Hash: %s", p, err)
 		}
 	}
 	return err
 }
 
-func (p *CommitStruct) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *CommitInfo) writeField2(oprot thrift.TProtocol) (err error) {
 	if p.IsSetMsg() {
 		if err := oprot.WriteFieldBegin("Msg", thrift.STRING, 2); err != nil {
 			return fmt.Errorf("%T write field begin error 2:Msg: %s", p, err)
@@ -1261,7 +1271,7 @@ func (p *CommitStruct) writeField2(oprot thrift.TProtocol) (err error) {
 	return err
 }
 
-func (p *CommitStruct) writeField3(oprot thrift.TProtocol) (err error) {
+func (p *CommitInfo) writeField3(oprot thrift.TProtocol) (err error) {
 	if p.IsSetAuthor() {
 		if err := oprot.WriteFieldBegin("Author", thrift.STRING, 3); err != nil {
 			return fmt.Errorf("%T write field begin error 3:Author: %s", p, err)
@@ -1276,30 +1286,38 @@ func (p *CommitStruct) writeField3(oprot thrift.TProtocol) (err error) {
 	return err
 }
 
-func (p *CommitStruct) writeField4(oprot thrift.TProtocol) (err error) {
-	if p.IsSetLastUpdateTime() {
-		if err := oprot.WriteFieldBegin("LastUpdateTime", thrift.I64, 4); err != nil {
-			return fmt.Errorf("%T write field begin error 4:LastUpdateTime: %s", p, err)
+func (p *CommitInfo) writeField4(oprot thrift.TProtocol) (err error) {
+	if p.IsSetRunNums() {
+		if err := oprot.WriteFieldBegin("RunNums", thrift.LIST, 4); err != nil {
+			return fmt.Errorf("%T write field begin error 4:RunNums: %s", p, err)
 		}
-		if err := oprot.WriteI64(int64(*p.LastUpdateTime)); err != nil {
-			return fmt.Errorf("%T.LastUpdateTime (4) field write error: %s", p, err)
+		if err := oprot.WriteListBegin(thrift.I32, len(p.RunNums)); err != nil {
+			return fmt.Errorf("error writing list begin: %s", err)
+		}
+		for _, v := range p.RunNums {
+			if err := oprot.WriteI32(int32(v)); err != nil {
+				return fmt.Errorf("%T. (0) field write error: %s", p, err)
+			}
+		}
+		if err := oprot.WriteListEnd(); err != nil {
+			return fmt.Errorf("error writing list end: %s", err)
 		}
 		if err := oprot.WriteFieldEnd(); err != nil {
-			return fmt.Errorf("%T write field end error 4:LastUpdateTime: %s", p, err)
+			return fmt.Errorf("%T write field end error 4:RunNums: %s", p, err)
 		}
 	}
 	return err
 }
 
-func (p *CommitStruct) String() string {
+func (p *CommitInfo) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("CommitStruct(%+v)", *p)
+	return fmt.Sprintf("CommitInfo(%+v)", *p)
 }
 
 type FetchTargetRepoLastCommitResonse struct {
-	Commit *CommitStruct `thrift:"Commit,1" json:"Commit"`
+	Commit *CommitInfo `thrift:"Commit,1" json:"Commit"`
 	// unused fields # 2 to 254
 	BaseResp *BaseResp `thrift:"BaseResp,255" json:"BaseResp"`
 }
@@ -1308,9 +1326,9 @@ func NewFetchTargetRepoLastCommitResonse() *FetchTargetRepoLastCommitResonse {
 	return &FetchTargetRepoLastCommitResonse{}
 }
 
-var FetchTargetRepoLastCommitResonse_Commit_DEFAULT *CommitStruct
+var FetchTargetRepoLastCommitResonse_Commit_DEFAULT *CommitInfo
 
-func (p *FetchTargetRepoLastCommitResonse) GetCommit() *CommitStruct {
+func (p *FetchTargetRepoLastCommitResonse) GetCommit() *CommitInfo {
 	if !p.IsSetCommit() {
 		return FetchTargetRepoLastCommitResonse_Commit_DEFAULT
 	}
@@ -1370,7 +1388,7 @@ func (p *FetchTargetRepoLastCommitResonse) Read(iprot thrift.TProtocol) error {
 }
 
 func (p *FetchTargetRepoLastCommitResonse) ReadField1(iprot thrift.TProtocol) error {
-	p.Commit = &CommitStruct{}
+	p.Commit = &CommitInfo{}
 	if err := p.Commit.Read(iprot); err != nil {
 		return fmt.Errorf("%T error reading struct: %s", p.Commit, err)
 	}

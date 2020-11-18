@@ -10,9 +10,9 @@ import (
 	"fmt"
 )
 
-func GetRepoInfoById(ctx context.Context, id int64) (*domain.Repo, util.OpResult) {
+func GetRepoInfoByHash(ctx context.Context, hash string) (*domain.Repo, util.OpResult) {
 	var repo *domain.Repo
-	err := manager.CodeFactoryDBRead.Where(fmt.Sprintf("repo_id = %d", id)).First(&repo).Error
+	err := manager.CodeFactoryDBRead.Where(fmt.Sprintf("hash = %d", hash)).First(&repo).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, util.NewSucOpResult()

@@ -121,19 +121,19 @@ func main() {
 			fmt.Fprintln(os.Stderr, "IsTargetRepoUpdated requires 1 args")
 			flag.Usage()
 		}
-		arg10 := flag.Arg(1)
-		mbTrans11 := thrift.NewTMemoryBufferLen(len(arg10))
-		defer mbTrans11.Close()
-		_, err12 := mbTrans11.WriteString(arg10)
-		if err12 != nil {
+		arg11 := flag.Arg(1)
+		mbTrans12 := thrift.NewTMemoryBufferLen(len(arg11))
+		defer mbTrans12.Close()
+		_, err13 := mbTrans12.WriteString(arg11)
+		if err13 != nil {
 			Usage()
 			return
 		}
-		factory13 := thrift.NewTSimpleJSONProtocolFactory()
-		jsProt14 := factory13.GetProtocol(mbTrans11)
+		factory14 := thrift.NewTSimpleJSONProtocolFactory()
+		jsProt15 := factory14.GetProtocol(mbTrans12)
 		argvalue0 := ci.NewIsTargetRepoUpdatedRequest()
-		err15 := argvalue0.Read(jsProt14)
-		if err15 != nil {
+		err16 := argvalue0.Read(jsProt15)
+		if err16 != nil {
 			Usage()
 			return
 		}
@@ -146,19 +146,19 @@ func main() {
 			fmt.Fprintln(os.Stderr, "FetchTargetRepoLastCommit requires 1 args")
 			flag.Usage()
 		}
-		arg16 := flag.Arg(1)
-		mbTrans17 := thrift.NewTMemoryBufferLen(len(arg16))
-		defer mbTrans17.Close()
-		_, err18 := mbTrans17.WriteString(arg16)
-		if err18 != nil {
+		arg17 := flag.Arg(1)
+		mbTrans18 := thrift.NewTMemoryBufferLen(len(arg17))
+		defer mbTrans18.Close()
+		_, err19 := mbTrans18.WriteString(arg17)
+		if err19 != nil {
 			Usage()
 			return
 		}
-		factory19 := thrift.NewTSimpleJSONProtocolFactory()
-		jsProt20 := factory19.GetProtocol(mbTrans17)
+		factory20 := thrift.NewTSimpleJSONProtocolFactory()
+		jsProt21 := factory20.GetProtocol(mbTrans18)
 		argvalue0 := ci.NewFetchTargetRepoLastCommitRequest()
-		err21 := argvalue0.Read(jsProt20)
-		if err21 != nil {
+		err22 := argvalue0.Read(jsProt21)
+		if err22 != nil {
 			Usage()
 			return
 		}

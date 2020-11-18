@@ -3,7 +3,7 @@ module ci
 go 1.14
 
 require (
-	git.apache.org/thrift.git v0.13.0 // indirect
+	git.apache.org/thrift.git v0.13.0
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/alicebob/miniredis v2.5.0+incompatible // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect

@@ -9,12 +9,11 @@ import (
 	"context"
 	"fmt"
 	git "github.com/libgit2/git2go"
-	"strconv"
 	"time"
 )
 
 func IsTargetRepoUpdated(ctx context.Context, r *code_factory_ci.IsTargetRepoUpdatedRequest) (*code_factory_ci.IsTargetRepoUpdatedResponse, error) {
-	repoStruct, opRes := dao.GetRepoInfoById(ctx, r.GetRepoId())
+	repoStruct, opRes := dao.GetRepoInfoById(ctx, r.GetHash())
 	if !opRes.Success() {
 		logs.CtxError(ctx, "[GetRepoInfoById] fail")
 		return buildIsTargetRepoUpdated(false, "[GetRepoInfoById] fail", util.ErrDBRead), nil
@@ -35,23 +34,18 @@ func IsTargetRepoUpdated(ctx context.Context, r *code_factory_ci.IsTargetRepoUpd
 		logs.CtxError(ctx, fmt.Sprintf("get latest commit fail, err: %+v", err))
 		return buildIsTargetRepoUpdated(false, fmt.Sprintf("get latest commit fail, err: %+v", err), util.ErrSystemInternal), nil
 	}
-	id, err := strconv.Atoi(commit.Id().String())
-	if err != nil {
-		logs.CtxError(ctx, fmt.Sprintf("atoi fail, err: %+v", err))
-		return buildIsTargetRepoUpdated(false, fmt.Sprintf("atoi fail, err: %+v", err), util.ErrSystemInternal), nil
-	}
 	c := &domain.Commit{
-		Id:             int64(id),
+		Hash:           commit.Id().String(),
 		Msg:            commit.Message(),
 		Author:         commit.Author().Name,
-		LastUpdateTime: time.Now().UnixNano() % 1e6 / 1e3,
+		RunNums: 		time.Now().UnixNano() % 1e6 / 1e3,
 	}
 	dao.SaveCommitToCache(c)
 	return buildSucIsTargetRepoUpdated(), nil
 }
 
 func FetchTargetRepoLastCommit(ctx context.Context, r *code_factory_ci.FetchTargetRepoLastCommitRequest) (*code_factory_ci.FetchTargetRepoLastCommitResonse, error) {
-	commit, opRes := dao.GetCommitByIdFromCache(r.GetRepoId())
+	commit, opRes := dao.GetCommitByHashFromCache(r.GetHash())
 	if !opRes.Success() { // ignore cache miss
 		logs.CtxWarn(ctx, "[GetCommitByIdFromCache] fail")
 		return buildFetchTargetRepoLastCommitResp(nil, "[GetCommitByIdFromCache] fail", util.ErrRedis), nil
@@ -76,12 +70,12 @@ func buildIsTargetRepoUpdated(isUpdated bool, msg string, code int32) *code_fact
 	return resp
 }
 
-func buildSucFetchTargetRepoLastCommitResp(commit *code_factory_ci.CommitStruct) *code_factory_ci.FetchTargetRepoLastCommitResonse {
+func buildSucFetchTargetRepoLastCommitResp(commit *code_factory_ci.CommitInfo) *code_factory_ci.FetchTargetRepoLastCommitResonse {
 	resp := buildFetchTargetRepoLastCommitResp(commit, "", util.Success)
 	return resp
 }
 
-func buildFetchTargetRepoLastCommitResp(commit *code_factory_ci.CommitStruct, msg string, code int32) *code_factory_ci.FetchTargetRepoLastCommitResonse {
+func buildFetchTargetRepoLastCommitResp(commit *code_factory_ci.CommitInfo, msg string, code int32) *code_factory_ci.FetchTargetRepoLastCommitResonse {
 	resp := &code_factory_ci.FetchTargetRepoLastCommitResonse{
 		Commit: commit,
 		BaseResp: &code_factory_ci.BaseResp{

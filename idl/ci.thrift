@@ -21,7 +21,7 @@ struct BaseResp {
 }
 
 struct IsTargetRepoUpdatedRequest {
-    1:      optional i64 RepoId,
+    1:      optional string Hash,
     255:    Base Base
 }
 
@@ -31,19 +31,19 @@ struct IsTargetRepoUpdatedResponse {
 }
 
 struct FetchTargetRepoLastCommitRequest {
-    1:      optional i64 RepoId,
+    1:      optional string Hash,
     255:    Base Base
 }
 
-struct CommitStruct {
-    1: optional i64 Id,
+struct CommitInfo {
+    1: optional string Hash,
     2: optional string  Msg,
     3: optional string Author,
-    4: optional i64 LastUpdateTime
+    4: optional list<i32> RunNums
 }
 
 struct FetchTargetRepoLastCommitResonse {
-    1:      optional CommitStruct Commit,
+    1:      optional CommitInfo Commit,
     255:    BaseResp BaseResp
 }
 
