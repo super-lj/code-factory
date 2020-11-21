@@ -4,6 +4,7 @@ import (
 	"ci-backend/dao"
 	"ci-backend/thrift/ci"
 	"context"
+	"time"
 
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -27,8 +28,7 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 ) (r *ci.RepoInfo, err error) {
 	// build result object
 	res := ci.RepoInfo{}
-	res.Name = name
-	res.MaxRunNum = 0 // TODO: temp solution, fix this
+	res.Name = r.Name
 
 	// find the repo
 	repo, ok := dao.WatchedRepos[name]
@@ -62,6 +62,21 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 		return nil, nil
 	}
 
+	// get max num of a repo from DB
+	type MaxNum struct {
+		MaxNum int32
+	}
+	maxNum := MaxNum{}
+	dbErr := dao.RunDB.
+		Select("reponame, max(num) as maxnum").
+		Group("reponame").
+		Having("reponame = ?", "name").
+		First(&maxNum).
+		Error
+	if dbErr == nil {
+		res.MaxRunNum = maxNum.MaxNum
+	}
+
 	return &res, nil
 }
 
@@ -73,7 +88,6 @@ func (h *CIBackendServiceHandler) GetBranchInfo(
 	// build result object
 	res := ci.BranchInfo{}
 	res.Name = branchName
-	res.RunNums = make([]int32, 0) // TODO: temp solution, fix this
 
 	// find the repo
 	repo, ok := dao.WatchedRepos[repoName]
@@ -87,6 +101,19 @@ func (h *CIBackendServiceHandler) GetBranchInfo(
 		return nil, nil
 	}
 	res.CommitHash = ref.Hash().String()
+
+	// get all runs of the branch from DB
+	runs := make([]dao.Run, 0)
+	dbErr := dao.RunDB.
+		Where("reponame = ? AND branchname = ?", repoName, branchName).
+		Find(&runs).
+		Error
+	if dbErr == nil {
+		for _, r := range runs {
+			res.RunNums = append(res.RunNums, r.Num)
+		}
+	}
+
 	return &res, nil
 }
 
@@ -98,7 +125,6 @@ func (h *CIBackendServiceHandler) GetCommitInfo(
 	// build result object
 	res := ci.CommitInfo{}
 	res.Hash = commitHash
-	res.RunNums = make([]int32, 0) // TODO: temp solution, fix this
 
 	// find the repo
 	repo, ok := dao.WatchedRepos[repoName]
@@ -113,6 +139,19 @@ func (h *CIBackendServiceHandler) GetCommitInfo(
 	}
 	res.Msg = ref.Message
 	res.Author = ref.Author.Name
+
+	// get all runs of the branch from DB
+	runs := make([]dao.Run, 0)
+	dbErr := dao.RunDB.
+		Where("reponame = ? AND commithash = ?", repoName, commitHash).
+		Find(&runs).
+		Error
+	if dbErr == nil {
+		for _, r := range runs {
+			res.RunNums = append(res.RunNums, r.Num)
+		}
+	}
+
 	return &res, nil
 }
 
@@ -121,16 +160,26 @@ func (h *CIBackendServiceHandler) GetRunInfo(
 	repoName string,
 	runNum int32,
 ) (r *ci.RunInfo, err error) {
-	// build result object
-	res := ci.RunInfo{}
-	res.Num = runNum
-
-	// find the repo
-	_, ok := dao.WatchedRepos[repoName]
-	if !ok {
+	run := dao.Run{}
+	dbErr := dao.RunDB.
+		Where("reponame = ? AND num = ?", repoName, runNum).
+		Find(&run).
+		Error
+	if dbErr != nil {
 		return nil, nil
 	}
 
-	// TODO: fetch run info from db
-	return nil, nil
+	res := ci.RunInfo{}
+	res.Num = runNum
+	res.StartTimestamp = int32(run.CreatedAt.Unix())
+	if run.Status == "IN_PROGRESS" {
+		res.Duration = int32(time.Now().Sub(run.CreatedAt).Seconds())
+	} else {
+		res.Duration = int32(run.UpdatedAt.Sub(run.CreatedAt).Seconds())
+	}
+	res.Status = run.Status
+	res.Log = run.Log
+	res.BranchName = run.BranchName
+	res.CommitHash = run.CommitHash
+	return &res, nil
 }

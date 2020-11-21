@@ -13,6 +13,7 @@ import (
 
 func main() {
 	// read the yml file
+	log.Println("Reading config file...")
 	if len(os.Args) < 2 {
 		log.Fatalln("Please specify config file path.")
 	}
@@ -25,12 +26,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("Cannot unmarshal config file: %v", err)
 	}
+	log.Println("Reading config file complete!")
 
 	// init DB
-	// dao.InitDB()
+	log.Println("Initing DB...")
+	dao.RunDB.AutoMigrate(&dao.Run{})
+	log.Println("DB init complete!")
 
 	// TODO: start repo observers
-	log.Println("Starting Repo Observers")
+	log.Println("Starting Repo Observers...")
 	for k, v := range ymlMap["repos"].(map[interface{}]interface{}) {
 		repoName := k.(string)
 		path := v.(map[interface{}]interface{})["path"].(string)
@@ -40,6 +44,7 @@ func main() {
 		}
 		dao.WatchedRepos[repoName] = *repo
 	}
+	log.Println("Repo Observers started!")
 
 	// start thrift server
 	log.Println("Starting Thrift Server")

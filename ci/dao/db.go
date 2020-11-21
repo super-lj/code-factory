@@ -7,13 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB gorm.DB
+var RunDB *gorm.DB
 
-func InitDB() {
-	dsn := "user=gorm password=gorm dbname=codefactoryci port=5432 sslmode=disable"
+func init() {
+	dsn := "host=localhost port=5432 user=cfci password=cfci dbname=codefactoryci sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Gorm Postgre open failed: %v", err)
 	}
-	DB = *db
+	RunDB = db
 }
