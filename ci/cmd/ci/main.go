@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ci-backend/actor"
 	"ci-backend/dao"
 	"ci-backend/handler"
 	"io/ioutil"
@@ -14,17 +15,30 @@ import (
 func main() {
 	// read the yml file
 	log.Println("Reading config file...")
+
 	if len(os.Args) < 2 {
 		log.Fatalln("Please specify config file path.")
 	}
+
 	bstr, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
 		log.Fatalf("Cannot open config file: %v", err)
 	}
+
 	ymlMap := make(map[interface{}]interface{})
 	err = yaml.Unmarshal([]byte(bstr), &ymlMap)
 	if err != nil {
 		log.Fatalf("Cannot unmarshal config file: %v", err)
+	}
+
+	for k, v := range ymlMap["repos"].(map[interface{}]interface{}) {
+		repoName := k.(string)
+		path := v.(map[interface{}]interface{})["path"].(string)
+		repo, err := git.PlainOpen(path)
+		if repo == nil || err != nil {
+			log.Fatalf("Cannot open repo %v", err)
+		}
+		dao.WatchedRepos[repoName] = repo
 	}
 	log.Println("Reading config file complete!")
 
@@ -35,14 +49,11 @@ func main() {
 
 	// TODO: start repo observers
 	log.Println("Starting Repo Observers...")
-	for k, v := range ymlMap["repos"].(map[interface{}]interface{}) {
-		repoName := k.(string)
-		path := v.(map[interface{}]interface{})["path"].(string)
-		repo, err := git.PlainOpen(path)
-		if repo == nil || err != nil {
-			log.Fatalf("Cannot open repo %v", err)
+	for repoName := range dao.WatchedRepos {
+		_, err := actor.StartRepoObserver(repoName)
+		if err != nil {
+			log.Fatalf("Start Repo OB failed: %v", err)
 		}
-		dao.WatchedRepos[repoName] = *repo
 	}
 	log.Println("Repo Observers started!")
 

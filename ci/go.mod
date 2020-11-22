@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/apache/thrift v0.13.0
+	github.com/deckarep/golang-set v1.7.1
 	github.com/go-git/go-git/v5 v5.2.0
 	github.com/jackc/pgx/v4 v4.9.2 // indirect
 	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9 // indirect

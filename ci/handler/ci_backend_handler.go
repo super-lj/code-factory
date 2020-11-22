@@ -42,7 +42,7 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 		return nil, nil
 	}
 	err = branches.ForEach(func(br *plumbing.Reference) error {
-		res.BranchNames = append(res.BranchNames, br.Name().String())
+		res.BranchNames = append(res.BranchNames, br.Name().Short())
 		return nil
 	})
 	if err != nil {
