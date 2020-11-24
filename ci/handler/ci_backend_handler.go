@@ -29,7 +29,7 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 ) (r *ci.RepoInfo, err error) {
 	// build result object
 	res := ci.RepoInfo{}
-	res.Name = r.Name
+	res.Name = name
 
 	// find the repo
 	repo, ok := config.WatchedRepos[name]
@@ -64,18 +64,20 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 	}
 
 	// get max num of a repo from DB
-	type MaxNum struct {
-		MaxNum int32
-	}
-	maxNum := MaxNum{}
-	dbErr := dao.RunDB.
-		Select("max(num) as maxnum").
+	rows, err := dao.RunDB.
+		Model(&dao.Run{}).
+		Select("max(num) as max_num").
 		Group("repo_name").
-		Having("repo_name = ?", "name").
-		First(&maxNum).
-		Error
-	if dbErr == nil {
-		res.MaxRunNum = maxNum.MaxNum
+		Having("repo_name = ?", name).
+		Rows()
+	if err != nil {
+		return nil, err
+	}
+	if rows.Next() {
+		err := rows.Scan(&res.MaxRunNum)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &res, nil

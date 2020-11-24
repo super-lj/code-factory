@@ -156,7 +156,7 @@ export default function BranchCard({
             <Grid container item xs={6} alignItems="center" wrap="nowrap">
               <SourceCommit />
               <Typography variant="h6" className={classes.branchName}>
-                {commitHash}
+                {commitHash.substring(0, 7)}
               </Typography>
             </Grid>
             <Grid container item xs={6} alignItems="center" wrap="nowrap">

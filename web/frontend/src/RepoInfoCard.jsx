@@ -112,11 +112,13 @@ export default function RepoInfoCard({
             <Grid container item xs>
               <ScheduleIcon />
               <Typography className={classes.repoTitle}>
-                {formatDuration({
-                  hours: Math.floor(duration / 3600),
-                  minutes: Math.floor(duration / 60) % 60,
-                  seconds: duration % 60,
-                })}
+                {duration === 0
+                  ? "0 second"
+                  : formatDuration({
+                      hours: Math.floor(duration / 3600),
+                      minutes: Math.floor(duration / 60) % 60,
+                      seconds: duration % 60,
+                    })}
               </Typography>
             </Grid>
             <Grid container item xs>

@@ -3,8 +3,10 @@ package resolver
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strconv"
-	"web-backend/mock"
+	"web-backend/loader"
+	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -27,11 +29,11 @@ func (r *BranchResolver) Name() string {
 func (r *BranchResolver) Commit() (*CommitResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.name)
-	res, err := BranchInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.BranchInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}
-	brInfo := res.(*mock.BranchInfo)
+	brInfo := res.(*ci.BranchInfo)
 	if brInfo == nil {
 		return nil, nil
 	}
@@ -51,14 +53,19 @@ func (r *BranchResolver) RunsConnection(args struct {
 }) (*BranchRunsConnectionResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.name)
-	res, err := BranchInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.BranchInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}
-	brInfo := res.(*mock.BranchInfo)
+	brInfo := res.(*ci.BranchInfo)
 	if brInfo == nil {
 		return nil, nil
 	}
+
+	// sort it to be large num first
+	sort.Slice(brInfo.RunNums, func(i, j int) bool {
+		return brInfo.RunNums[i] > brInfo.RunNums[j]
+	})
 
 	// calculate the start and end
 	start := 0

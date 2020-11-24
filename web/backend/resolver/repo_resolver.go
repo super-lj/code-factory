@@ -3,8 +3,8 @@ package resolver
 import (
 	"context"
 	"strconv"
-	"strings"
-	"web-backend/mock"
+	"web-backend/loader"
+	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -28,12 +28,12 @@ func (r *RepoResolver) BranchesConnection(args struct {
 	After *graphql.ID
 }) (*RepoBranchesConnectionResolver, error) {
 	// fetch repo info
-	res, err := RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
+	res, err := loader.RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
 	if err != nil {
 		return nil, err
 	}
-	repo := res.(*mock.RepoInfo)
-	if res.(*mock.RepoInfo) == nil {
+	repo := res.(*ci.RepoInfo)
+	if res.(*ci.RepoInfo) == nil {
 		return nil, nil
 	}
 
@@ -85,12 +85,12 @@ func (r *RepoResolver) CommitsConnection(args struct {
 	After *graphql.ID
 }) (*RepoCommitsConnectionResolver, error) {
 	// fetch repo info
-	res, err := RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
+	res, err := loader.RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
 	if err != nil {
 		return nil, err
 	}
-	repo := res.(*mock.RepoInfo)
-	if res.(*mock.RepoInfo) == nil {
+	repo := res.(*ci.RepoInfo)
+	if res.(*ci.RepoInfo) == nil {
 		return nil, nil
 	}
 
@@ -142,51 +142,48 @@ func (r *RepoResolver) RunsConnection(args struct {
 	After *graphql.ID
 }) (*RepoRunsConnectionResolver, error) {
 	// fetch repo info
-	res, err := RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
+	res, err := loader.RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
 	if err != nil {
 		return nil, err
 	}
-	repo := res.(*mock.RepoInfo)
-	if res.(*mock.RepoInfo) == nil {
+	repo := res.(*ci.RepoInfo)
+	if res.(*ci.RepoInfo) == nil {
 		return nil, nil
 	}
 
-	// calculate the start and end
-	var start int32 = 1
-	if args.After != nil {
-		strs := strings.Split(string(*args.After), " ")
-		if len(strs) != 2 {
-			return nil, nil
-		}
-		afterNumInt64, err := strconv.ParseInt(strs[1], 10, 32)
-		if err != nil {
-			return nil, err
-		}
-		afterNum := int32(afterNumInt64)
-		if afterNum >= repo.MaxRunNum {
-			repoRunRx := &RepoRunsConnectionResolver{
-				pageInfo: &PageInfoResolver{true},
-			}
-			return repoRunRx, nil
-		}
-		start = afterNum + 1
+	// build the num array in descending order
+	runNums := make([]int32, 0)
+	for n := repo.MaxRunNum; n >= 1; n-- {
+		runNums = append(runNums, n)
 	}
-	end := repo.MaxRunNum + 1
+
+	// calculate the start and end
+	start := 0
+	if args.After != nil {
+		for ; start < len(runNums); start++ {
+			runID := graphql.ID(r.name + " " + strconv.Itoa(int(runNums[start])))
+			if runID == *args.After {
+				start++
+				break
+			}
+		}
+	}
+	end := len(runNums)
 	if args.First != nil {
 		if *args.First < 0 {
 			return nil, nil
 		}
-		end = start + *args.First
+		end = start + int(*args.First)
 	}
-	if end > repo.MaxRunNum+1 {
-		end = repo.MaxRunNum + 1
+	if end > len(runNums) {
+		end = len(runNums)
 	}
 
 	// build next level resolver
 	repoRunRx := &RepoRunsConnectionResolver{
-		pageInfo: &PageInfoResolver{end != repo.MaxRunNum+1},
+		pageInfo: &PageInfoResolver{end != len(runNums)},
 	}
-	for num := start; num < end; num++ {
+	for _, num := range runNums[start:end] {
 		id := graphql.ID(r.name + " " + strconv.Itoa(int(num)))
 		repoRunRx.edges = append(repoRunRx.edges, &RepoRunsEdgeResolver{
 			cursor: id,

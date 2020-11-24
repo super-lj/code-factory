@@ -12,18 +12,21 @@ import (
 )
 
 func main() {
-	// read and setup GraphQL schema and resolver
+	// init thrift client
+	// log.Println("Initing Thrift CIBackend Client")
+	// err := loader.InitThriftCIClient("localhost:9090")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// setup and start GraphQL server
+	log.Println("Starting GraphQL web server")
 	bstr, err := ioutil.ReadFile("schema/schema.graphql")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	s := graphql.MustParseSchema(string(bstr), &resolver.RootResolver{})
 	http.Handle("/query", cors.Default().Handler(&relay.Handler{Schema: s}))
-
-	// register graphql playground handler
 	http.Handle("/", http.FileServer(http.Dir("./playground")))
-
-	// start web server
-	log.Println("Starting web server")
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }

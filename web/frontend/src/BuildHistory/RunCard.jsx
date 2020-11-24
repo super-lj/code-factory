@@ -167,17 +167,19 @@ export default function RunCard({
             <Grid container item xs={6} alignItems="center" wrap="nowrap">
               <ScheduleIcon />
               <Typography variant="h6" className={classes.branchName}>
-                {formatDuration({
-                  hours: Math.floor(duration / 3600),
-                  minutes: Math.floor(duration / 60) % 60,
-                  seconds: duration % 60,
-                })}
+                {duration === 0
+                  ? "0 second"
+                  : formatDuration({
+                      hours: Math.floor(duration / 3600),
+                      minutes: Math.floor(duration / 60) % 60,
+                      seconds: duration % 60,
+                    })}
               </Typography>
             </Grid>
             <Grid container item xs={6} alignItems="center" wrap="nowrap">
               <SourceCommit />
               <Typography variant="h6" className={classes.branchName}>
-                {commitHash}
+                {commitHash.substring(0, 7)}
               </Typography>
             </Grid>
             <Grid container item xs={6} alignItems="center" wrap="nowrap">

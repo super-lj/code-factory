@@ -1,10 +1,10 @@
-package resolver
+package loader
 
 import (
 	"context"
+	"log"
 	"strconv"
 	"strings"
-	"web-backend/mock"
 
 	"github.com/graph-gophers/dataloader"
 )
@@ -12,22 +12,56 @@ import (
 // batch functions
 var getRepoNameBatchFn = func(ctx context.Context, keys dataloader.Keys) []*dataloader.Result {
 	var results []*dataloader.Result
+
+	cli, tp, err := CreateCIBackendClient(CIBackendAddr)
+	if err != nil {
+		log.Print(err)
+		return results
+	}
+	defer tp.Close()
+
 	for i := 0; i < len(keys.Keys()); i++ {
-		results = append(results, &dataloader.Result{Data: mock.GetRepoNames()})
+		repoNames, err := cli.GetRepoNames(context.Background())
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+		results = append(results, &dataloader.Result{Data: repoNames})
 	}
 	return results
 }
 
 var getRepoInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*dataloader.Result {
 	var results []*dataloader.Result
+
+	cli, tp, err := CreateCIBackendClient(CIBackendAddr)
+	if err != nil {
+		log.Print(err)
+		return results
+	}
+	defer tp.Close()
+
 	for _, name := range keys.Keys() {
-		results = append(results, &dataloader.Result{Data: mock.GetRepoInfo(name)})
+		repoInfo, err := cli.GetRepoInfo(context.Background(), name)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+		results = append(results, &dataloader.Result{Data: repoInfo})
 	}
 	return results
 }
 
 var getBranchInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*dataloader.Result {
 	var results []*dataloader.Result
+
+	cli, tp, err := CreateCIBackendClient(CIBackendAddr)
+	if err != nil {
+		log.Print(err)
+		return results
+	}
+	defer tp.Close()
+
 	for _, k := range keys.Keys() {
 		strs := strings.Split(k, ",")
 		if len(strs) != 2 {
@@ -35,7 +69,11 @@ var getBranchInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*da
 		}
 		repoName := strs[0]
 		branchName := strs[1]
-		brInfo := mock.GetBranchInfo(repoName, branchName)
+		brInfo, err := cli.GetBranchInfo(context.Background(), repoName, branchName)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
 		results = append(results, &dataloader.Result{Data: brInfo})
 	}
 	return results
@@ -43,6 +81,14 @@ var getBranchInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*da
 
 var getCommitInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*dataloader.Result {
 	var results []*dataloader.Result
+
+	cli, tp, err := CreateCIBackendClient(CIBackendAddr)
+	if err != nil {
+		log.Print(err)
+		return results
+	}
+	defer tp.Close()
+
 	for _, k := range keys.Keys() {
 		strs := strings.Split(k, ",")
 		if len(strs) != 2 {
@@ -50,14 +96,26 @@ var getCommitInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*da
 		}
 		repoName := strs[0]
 		commitHash := strs[1]
-		commmitInfo := mock.GetCommitInfo(repoName, commitHash)
-		results = append(results, &dataloader.Result{Data: commmitInfo})
+		cmInfo, err := cli.GetCommitInfo(context.Background(), repoName, commitHash)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+		results = append(results, &dataloader.Result{Data: cmInfo})
 	}
 	return results
 }
 
 var getRunInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*dataloader.Result {
 	var results []*dataloader.Result
+
+	cli, tp, err := CreateCIBackendClient(CIBackendAddr)
+	if err != nil {
+		log.Print(err)
+		return results
+	}
+	defer tp.Close()
+
 	for _, k := range keys.Keys() {
 		strs := strings.Split(k, ",")
 		if len(strs) != 2 {
@@ -66,9 +124,14 @@ var getRunInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*datal
 		repoName := strs[0]
 		runNum, err := strconv.ParseInt(strs[1], 10, 32)
 		if err != nil {
-			return []*dataloader.Result{}
+			log.Print(err)
+			continue
 		}
-		runInfo := mock.GetRunInfo(repoName, int32(runNum))
+		runInfo, err := cli.GetRunInfo(context.Background(), repoName, int32(runNum))
+		if err != nil {
+			log.Print(err)
+			continue
+		}
 		results = append(results, &dataloader.Result{Data: runInfo})
 	}
 	return results

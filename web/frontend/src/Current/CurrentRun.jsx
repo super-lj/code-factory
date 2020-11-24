@@ -285,17 +285,19 @@ export default function CurrentRun({ repoName }) {
               <Grid item container xs={6} alignItems="center" wrap="nowrap">
                 <SourceCommit />
                 <Typography variant="h6" className={classes.typo}>
-                  {commitID}
+                  {commitID.substring(0, 7)}
                 </Typography>
               </Grid>
               <Grid item container xs={6} alignItems="center" wrap="nowrap">
                 <ScheduleIcon />
                 <Typography variant="h6" className={classes.typo}>
-                  {formatDuration({
-                    hours: Math.floor(duration / 3600),
-                    minutes: Math.floor(duration / 60) % 60,
-                    seconds: duration % 60,
-                  })}
+                  {duration === 0
+                    ? "0 second"
+                    : formatDuration({
+                        hours: Math.floor(duration / 3600),
+                        minutes: Math.floor(duration / 60) % 60,
+                        seconds: duration % 60,
+                      })}
                 </Typography>
               </Grid>
               <Grid item container xs={6} alignItems="center" wrap="nowrap">

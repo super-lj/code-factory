@@ -29,19 +29,13 @@ const GET_REPO_BASIC_INFO = gql`
   query GetRepoBasicInfo {
     repos {
       name
-      branchesConnection(first: 1) {
+      runsConnection(first: 1) {
         edges {
           node {
-            runsConnection(first: 1) {
-              edges {
-                node {
-                  num
-                  startTimestamp
-                  duration
-                  status
-                }
-              }
-            }
+            num
+            startTimestamp
+            duration
+            status
           }
         }
       }
@@ -57,18 +51,10 @@ const renderRepoCards = ({ loading, error, data, selectedRepoName }) => {
   return data.repos.map((repo) => {
     const {
       name,
-      branchesConnection: {
+      runsConnection: {
         edges: [
           {
-            node: {
-              runsConnection: {
-                edges: [
-                  {
-                    node: { num, startTimestamp, duration, status },
-                  },
-                ],
-              },
-            },
+            node: { num, startTimestamp, duration, status },
           },
         ],
       },

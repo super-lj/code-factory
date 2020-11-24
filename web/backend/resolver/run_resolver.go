@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"web-backend/mock"
+	"web-backend/loader"
+	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -27,51 +28,51 @@ func (r *RunResolver) Num() int32 {
 func (r *RunResolver) StartTimestamp() (int32, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return 0, err
 	}
-	return res.(*mock.RunInfo).StartTimestamp, nil
+	return res.(*ci.RunInfo).StartTimestamp, nil
 }
 
 func (r *RunResolver) Duration() (int32, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return 0, err
 	}
-	return res.(*mock.RunInfo).Duration, nil
+	return res.(*ci.RunInfo).Duration, nil
 }
 
 func (r *RunResolver) Status() (string, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
-	return res.(*mock.RunInfo).Status, nil
+	return res.(*ci.RunInfo).Status, nil
 }
 
 func (r *RunResolver) Log() (string, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
-	return res.(*mock.RunInfo).Log, nil
+	return res.(*ci.RunInfo).Log, nil
 }
 
 func (r *RunResolver) Branch() (*BranchResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}
-	runInfo := res.(*mock.RunInfo)
+	runInfo := res.(*ci.RunInfo)
 	if runInfo == nil {
 		return nil, nil
 	}
@@ -87,11 +88,11 @@ func (r *RunResolver) Branch() (*BranchResolver, error) {
 func (r *RunResolver) Commit() (*CommitResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}
-	runInfo := res.(*mock.RunInfo)
+	runInfo := res.(*ci.RunInfo)
 	if runInfo == nil {
 		return nil, nil
 	}

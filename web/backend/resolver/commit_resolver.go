@@ -3,8 +3,10 @@ package resolver
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strconv"
-	"web-backend/mock"
+	"web-backend/loader"
+	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -27,21 +29,21 @@ func (r *CommitResolver) Hash() string {
 func (r *CommitResolver) Msg() (string, error) {
 	// fetch commit info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.hash)
-	res, err := CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
-	return res.(*mock.CommitInfo).Msg, nil
+	return res.(*ci.CommitInfo).Msg, nil
 }
 
 func (r *CommitResolver) Author() (string, error) {
 	// fetch commit info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.hash)
-	res, err := CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
-	return res.(*mock.CommitInfo).Author, nil
+	return res.(*ci.CommitInfo).Author, nil
 }
 
 func (r *CommitResolver) RunsConnection(args struct {
@@ -50,14 +52,19 @@ func (r *CommitResolver) RunsConnection(args struct {
 }) (*CommitRunsConnectionResolver, error) {
 	// fetch commit info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.hash)
-	res, err := CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	res, err := loader.CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}
-	if res.(*mock.CommitInfo) == nil {
+	if res.(*ci.CommitInfo) == nil {
 		return nil, nil
 	}
-	commitInfo := res.(*mock.CommitInfo)
+	commitInfo := res.(*ci.CommitInfo)
+
+	// sort it to be large num first
+	sort.Slice(commitInfo.RunNums, func(i, j int) bool {
+		return commitInfo.RunNums[i] > commitInfo.RunNums[j]
+	})
 
 	// calculate the start and end
 	start := 0
