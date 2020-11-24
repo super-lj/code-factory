@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"ci-backend/config"
 	"ci-backend/dao"
 	"ci-backend/thrift/ci"
 	"context"
@@ -16,7 +17,7 @@ func (h *CIBackendServiceHandler) GetRepoNames(
 	ctx context.Context,
 ) (r []string, err error) {
 	res := []string{}
-	for repoName := range dao.WatchedRepos {
+	for repoName := range config.WatchedRepos {
 		res = append(res, repoName)
 	}
 	return res, nil
@@ -31,7 +32,7 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 	res.Name = r.Name
 
 	// find the repo
-	repo, ok := dao.WatchedRepos[name]
+	repo, ok := config.WatchedRepos[name]
 	if !ok {
 		return nil, nil
 	}
@@ -68,9 +69,9 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 	}
 	maxNum := MaxNum{}
 	dbErr := dao.RunDB.
-		Select("reponame, max(num) as maxnum").
-		Group("reponame").
-		Having("reponame = ?", "name").
+		Select("max(num) as maxnum").
+		Group("repo_name").
+		Having("repo_name = ?", "name").
 		First(&maxNum).
 		Error
 	if dbErr == nil {
@@ -90,7 +91,7 @@ func (h *CIBackendServiceHandler) GetBranchInfo(
 	res.Name = branchName
 
 	// find the repo
-	repo, ok := dao.WatchedRepos[repoName]
+	repo, ok := config.WatchedRepos[repoName]
 	if !ok {
 		return nil, nil
 	}
@@ -105,7 +106,7 @@ func (h *CIBackendServiceHandler) GetBranchInfo(
 	// get all runs of the branch from DB
 	runs := make([]dao.Run, 0)
 	dbErr := dao.RunDB.
-		Where("reponame = ? AND branchname = ?", repoName, branchName).
+		Where("repo_name = ? AND branch_name = ?", repoName, branchName).
 		Find(&runs).
 		Error
 	if dbErr == nil {
@@ -127,7 +128,7 @@ func (h *CIBackendServiceHandler) GetCommitInfo(
 	res.Hash = commitHash
 
 	// find the repo
-	repo, ok := dao.WatchedRepos[repoName]
+	repo, ok := config.WatchedRepos[repoName]
 	if !ok {
 		return nil, nil
 	}
@@ -143,7 +144,7 @@ func (h *CIBackendServiceHandler) GetCommitInfo(
 	// get all runs of the branch from DB
 	runs := make([]dao.Run, 0)
 	dbErr := dao.RunDB.
-		Where("reponame = ? AND commithash = ?", repoName, commitHash).
+		Where("repo_name = ? AND commit_hash = ?", repoName, commitHash).
 		Find(&runs).
 		Error
 	if dbErr == nil {
@@ -162,7 +163,7 @@ func (h *CIBackendServiceHandler) GetRunInfo(
 ) (r *ci.RunInfo, err error) {
 	run := dao.Run{}
 	dbErr := dao.RunDB.
-		Where("reponame = ? AND num = ?", repoName, runNum).
+		Where("repo_name = ? AND num = ?", repoName, runNum).
 		Find(&run).
 		Error
 	if dbErr != nil {
