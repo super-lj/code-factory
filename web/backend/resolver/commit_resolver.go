@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-	"web-backend/loader"
 	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
@@ -26,33 +25,38 @@ func (r *CommitResolver) Hash() string {
 	return r.hash
 }
 
-func (r *CommitResolver) Msg() (string, error) {
+func (r *CommitResolver) Msg(ctx context.Context) (string, error) {
 	// fetch commit info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.hash)
-	res, err := loader.CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	commitInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["commit_info"]
+	res, err := commitInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
 	return res.(*ci.CommitInfo).Msg, nil
 }
 
-func (r *CommitResolver) Author() (string, error) {
+func (r *CommitResolver) Author(ctx context.Context) (string, error) {
 	// fetch commit info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.hash)
-	res, err := loader.CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	commitInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["commit_info"]
+	res, err := commitInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
 	return res.(*ci.CommitInfo).Author, nil
 }
 
-func (r *CommitResolver) RunsConnection(args struct {
-	First *int32
-	After *graphql.ID
-}) (*CommitRunsConnectionResolver, error) {
+func (r *CommitResolver) RunsConnection(
+	ctx context.Context,
+	args struct {
+		First *int32
+		After *graphql.ID
+	}) (*CommitRunsConnectionResolver, error) {
 	// fetch commit info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.hash)
-	res, err := loader.CommitInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	commitInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["commit_info"]
+	res, err := commitInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}

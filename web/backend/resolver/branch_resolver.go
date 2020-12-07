@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-	"web-backend/loader"
 	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
@@ -26,10 +25,11 @@ func (r *BranchResolver) Name() string {
 	return r.name
 }
 
-func (r *BranchResolver) Commit() (*CommitResolver, error) {
+func (r *BranchResolver) Commit(ctx context.Context) (*CommitResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.name)
-	res, err := loader.BranchInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	branchInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["branch_info"]
+	res, err := branchInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}
@@ -47,13 +47,16 @@ func (r *BranchResolver) Commit() (*CommitResolver, error) {
 	return cmRx, nil
 }
 
-func (r *BranchResolver) RunsConnection(args struct {
-	First *int32
-	After *graphql.ID
-}) (*BranchRunsConnectionResolver, error) {
+func (r *BranchResolver) RunsConnection(
+	ctx context.Context,
+	args struct {
+		First *int32
+		After *graphql.ID
+	}) (*BranchRunsConnectionResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, r.name)
-	res, err := loader.BranchInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	branchInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["branch_info"]
+	res, err := branchInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}

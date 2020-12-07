@@ -138,8 +138,12 @@ var getRunInfoBatchFn = func(ctx context.Context, keys dataloader.Keys) []*datal
 }
 
 // Loaders
-var RepoNameloader = dataloader.NewBatchedLoader(getRepoNameBatchFn)
-var RepoInfoloader = dataloader.NewBatchedLoader(getRepoInfoBatchFn)
-var BranchInfoloader = dataloader.NewBatchedLoader(getBranchInfoBatchFn)
-var CommitInfoloader = dataloader.NewBatchedLoader(getCommitInfoBatchFn)
-var RunInfoloader = dataloader.NewBatchedLoader(getRunInfoBatchFn)
+func GetDataLoaders() map[string]*dataloader.Loader {
+	return map[string]*dataloader.Loader{
+		"repo_name":   dataloader.NewBatchedLoader(getRepoNameBatchFn),
+		"repo_info":   dataloader.NewBatchedLoader(getRepoInfoBatchFn),
+		"branch_info": dataloader.NewBatchedLoader(getBranchInfoBatchFn),
+		"commit_info": dataloader.NewBatchedLoader(getCommitInfoBatchFn),
+		"run_info":    dataloader.NewBatchedLoader(getRunInfoBatchFn),
+	}
+}

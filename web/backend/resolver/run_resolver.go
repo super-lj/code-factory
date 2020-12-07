@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"web-backend/loader"
 	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
@@ -25,50 +24,55 @@ func (r *RunResolver) Num() int32 {
 	return r.num
 }
 
-func (r *RunResolver) StartTimestamp() (int32, error) {
+func (r *RunResolver) StartTimestamp(ctx context.Context) (int32, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	runInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["run_info"]
+	res, err := runInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return 0, err
 	}
 	return res.(*ci.RunInfo).StartTimestamp, nil
 }
 
-func (r *RunResolver) Duration() (int32, error) {
+func (r *RunResolver) Duration(ctx context.Context) (int32, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	runInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["run_info"]
+	res, err := runInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return 0, err
 	}
 	return res.(*ci.RunInfo).Duration, nil
 }
 
-func (r *RunResolver) Status() (string, error) {
+func (r *RunResolver) Status(ctx context.Context) (string, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	runInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["run_info"]
+	res, err := runInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
 	return res.(*ci.RunInfo).Status, nil
 }
 
-func (r *RunResolver) Log() (string, error) {
+func (r *RunResolver) Log(ctx context.Context) (string, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	runInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["run_info"]
+	res, err := runInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return "", err
 	}
 	return res.(*ci.RunInfo).Log, nil
 }
 
-func (r *RunResolver) Branch() (*BranchResolver, error) {
+func (r *RunResolver) Branch(ctx context.Context) (*BranchResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	runInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["run_info"]
+	res, err := runInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +89,11 @@ func (r *RunResolver) Branch() (*BranchResolver, error) {
 	return brRx, nil
 }
 
-func (r *RunResolver) Commit() (*CommitResolver, error) {
+func (r *RunResolver) Commit(ctx context.Context) (*CommitResolver, error) {
 	// load branch info
 	fetchKey := fmt.Sprintf("%s,%s", r.repoName, strconv.Itoa(int(r.num)))
-	res, err := loader.RunInfoloader.Load(context.TODO(), dataloader.StringKey(fetchKey))()
+	runInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["run_info"]
+	res, err := runInfoloader.Load(ctx, dataloader.StringKey(fetchKey))()
 	if err != nil {
 		return nil, err
 	}

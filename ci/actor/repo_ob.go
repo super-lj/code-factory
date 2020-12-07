@@ -47,7 +47,7 @@ func RepoObserverMainLoop(repoName string, repo *git.Repository, ch chan string)
 		ch <- fmt.Sprintf("Cannot read max num of repo [%s] from DB: %v", repoName, err)
 		return
 	}
-	if rows.Next() {
+	for rows.Next() {
 		err := rows.Scan(&nextRunNum)
 		if err != nil {
 			ch <- fmt.Sprintf("Cannot read max num of repo [%s] from DB: %v", repoName, err)

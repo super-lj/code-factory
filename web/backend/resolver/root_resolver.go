@@ -2,7 +2,6 @@ package resolver
 
 import (
 	"context"
-	"web-backend/loader"
 
 	"github.com/graph-gophers/dataloader"
 	"github.com/graph-gophers/graphql-go"
@@ -10,7 +9,7 @@ import (
 
 type RootResolver struct{}
 
-func (r *RootResolver) Repos(args struct{ Name *string }) []*RepoResolver {
+func (r *RootResolver) Repos(ctx context.Context, args struct{ Name *string }) []*RepoResolver {
 	var repoRxs []*RepoResolver
 	if args.Name != nil {
 		repoRxs = append(repoRxs, &RepoResolver{
@@ -18,7 +17,8 @@ func (r *RootResolver) Repos(args struct{ Name *string }) []*RepoResolver {
 			name: *args.Name,
 		})
 	} else {
-		res, err := loader.RepoNameloader.Load(context.TODO(), dataloader.StringKey(""))()
+		repoNameLoader := ctx.Value("loaders").(map[string]*dataloader.Loader)["repo_name"]
+		res, err := repoNameLoader.Load(ctx, dataloader.StringKey(""))()
 		if err != nil {
 			return []*RepoResolver{}
 		}

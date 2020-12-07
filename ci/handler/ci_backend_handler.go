@@ -5,6 +5,7 @@ import (
 	"ci-backend/dao"
 	"ci-backend/thrift/ci"
 	"context"
+	"sort"
 	"time"
 
 	"github.com/go-git/go-git/v5/plumbing"
@@ -20,6 +21,7 @@ func (h *CIBackendServiceHandler) GetRepoNames(
 	for repoName := range config.WatchedRepos {
 		res = append(res, repoName)
 	}
+	sort.Strings(res)
 	return res, nil
 }
 
@@ -73,7 +75,7 @@ func (h *CIBackendServiceHandler) GetRepoInfo(
 	if err != nil {
 		return nil, err
 	}
-	if rows.Next() {
+	for rows.Next() {
 		err := rows.Scan(&res.MaxRunNum)
 		if err != nil {
 			return nil, err

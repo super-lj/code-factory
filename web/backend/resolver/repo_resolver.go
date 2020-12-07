@@ -3,7 +3,6 @@ package resolver
 import (
 	"context"
 	"strconv"
-	"web-backend/loader"
 	"web-backend/thrift/ci"
 
 	"github.com/graph-gophers/dataloader"
@@ -23,12 +22,15 @@ func (r *RepoResolver) Name() string {
 	return r.name
 }
 
-func (r *RepoResolver) BranchesConnection(args struct {
-	First *int32
-	After *graphql.ID
-}) (*RepoBranchesConnectionResolver, error) {
+func (r *RepoResolver) BranchesConnection(
+	ctx context.Context,
+	args struct {
+		First *int32
+		After *graphql.ID
+	}) (*RepoBranchesConnectionResolver, error) {
 	// fetch repo info
-	res, err := loader.RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
+	repoInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["repo_info"]
+	res, err := repoInfoloader.Load(ctx, dataloader.StringKey(r.name))()
 	if err != nil {
 		return nil, err
 	}
@@ -80,12 +82,15 @@ func (r *RepoResolver) BranchesConnection(args struct {
 	return repoBrRx, nil
 }
 
-func (r *RepoResolver) CommitsConnection(args struct {
-	First *int32
-	After *graphql.ID
-}) (*RepoCommitsConnectionResolver, error) {
+func (r *RepoResolver) CommitsConnection(
+	ctx context.Context,
+	args struct {
+		First *int32
+		After *graphql.ID
+	}) (*RepoCommitsConnectionResolver, error) {
 	// fetch repo info
-	res, err := loader.RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
+	repoInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["repo_info"]
+	res, err := repoInfoloader.Load(ctx, dataloader.StringKey(r.name))()
 	if err != nil {
 		return nil, err
 	}
@@ -137,12 +142,15 @@ func (r *RepoResolver) CommitsConnection(args struct {
 	return repoCmRx, nil
 }
 
-func (r *RepoResolver) RunsConnection(args struct {
-	First *int32
-	After *graphql.ID
-}) (*RepoRunsConnectionResolver, error) {
+func (r *RepoResolver) RunsConnection(
+	ctx context.Context,
+	args struct {
+		First *int32
+		After *graphql.ID
+	}) (*RepoRunsConnectionResolver, error) {
 	// fetch repo info
-	res, err := loader.RepoInfoloader.Load(context.TODO(), dataloader.StringKey(r.name))()
+	repoInfoloader := ctx.Value("loaders").(map[string]*dataloader.Loader)["repo_info"]
+	res, err := repoInfoloader.Load(ctx, dataloader.StringKey(r.name))()
 	if err != nil {
 		return nil, err
 	}
